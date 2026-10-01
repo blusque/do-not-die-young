@@ -22,7 +22,7 @@
 | --- | --- |
 | `index.html` | 自包含阅读页，零外部依赖，可离线打开 |
 | `dist/how-to-live-better-full.pdf` | PDF，展开每条建议的「来源」文献（约 610 页） |
-| `dist/how-to-live-better-simple.pdf` | PDF，来源只留「来源（N 条文献）」一行（约 490 页） |
+| `dist/how-to-live-better-simple.pdf` | PDF，不含「来源」文献（约 440 页） |
 
 PDF 由本机无头 Chrome 生成，不提交进仓库（已写入 `.gitignore`）。
 
@@ -76,7 +76,7 @@ python make_pdf.py index.html -o dist
 | `--prefix` | 输出文件名前缀（默认 `how-to-live-better`） |
 
 - **full**：把每个「来源」折叠块展开，文献完整。
-- **simple**：来源保持收起，只留「来源（N 条文献）」一行，更精简。
+- **simple**：整段「来源」都不显示，更精简。
 
 ## 自动更新
 

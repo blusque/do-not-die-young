@@ -2,7 +2,7 @@
 """把 build.py 生成的 index.html 渲染成 PDF，一次出两个版本。
 
     full    —— 展开每一条建议的「来源」文献；
-    simple  —— 来源保持收起，只留「来源（N 条文献）」这一行，体积小很多。
+    simple  —— 整段「来源」都不显示，体积小很多。
 
 用无头 Chrome 的 --print-to-pdf 渲染：调用的是 index.html 自带的 @media print
 样式（会隐藏顶栏、左侧目录、回到顶部按钮）。
@@ -108,10 +108,10 @@ def main():
     n = html.count(DETAILS)
     page_css = "" if a.paper.lower() in ("default", "none", "") else "@page{size:%s;margin:12mm}" % a.paper
 
-    # full：把每个 <details class="src"> 打开；simple：保持收起，并强制不显示来源正文
+    # full：把每个 <details class="src"> 展开；simple：整段「来源」（含标题行）直接不渲染
     variants = {
         "full": (html.replace(DETAILS, DETAILS_OPEN), page_css),
-        "simple": (html, page_css + '.src .sbody{display:none!important}'),
+        "simple": (html, page_css + '.src{display:none!important}'),
     }
 
     print("Chrome: %s" % chrome)

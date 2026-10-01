@@ -56,7 +56,7 @@ jobs:
 
           包含两个版本：
           - \`how-to-live-better-full.pdf\`：展开每条的「来源」文献
-          - \`how-to-live-better-simple.pdf\`：来源只保留「来源（N 条文献）」一行
+          - \`how-to-live-better-simple.pdf\`：不含「来源」文献
 
           由 .github/workflows/pdf.yml 自动生成。
           EOF
