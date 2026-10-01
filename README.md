@@ -47,10 +47,31 @@ python build.py 1 2 16 --repo /tmp/upstream
 统计口径（条目数、A/B/C 分级、性价比三档）与上游的 `tools/sync-stats.ps1`
 和 `index.html` 保持一致，生成结果可与上游徽章逐项对照。
 
+## 导出 PDF
+
+`make_pdf.py` 用本机无头 Chrome 把 `index.html` 渲染成两个版本的 PDF：
+
+```bash
+# 需要先有 index.html（build.py 生成）
+python make_pdf.py index.html -o dist
+# 产物：dist/how-to-live-better-full.pdf   （展开全部来源文献）
+#       dist/how-to-live-better-simple.pdf （来源只留「来源（N 条文献）」一行）
+```
+
+可用 `--paper A4|Letter` 换纸张、`--chrome /path/to/chrome` 指定浏览器。
+
 ## 自动更新
 
-`.github/workflows/rebuild.yml` 每天 06:00（北京时间）拉取上游重新生成，
-内容有变化才提交。也可以去 Actions 页面手动触发。
+- `.github/workflows/rebuild.yml` 每天 06:00（北京时间）拉取上游重新生成
+  `index.html`，内容有变化才提交。
+- `.github/workflows/pdf.yml` 每天 07:00（北京时间）从上游拉最新书稿，生成
+  simple / full 两个 PDF，发布到滚动 Release：
+
+  **下载：** https://github.com/cdyforever/how-to-live-better/releases/tag/pdf-latest
+
+  该 Release 的 tag 固定为 `pdf-latest`，每天覆盖更新，链接长期不变。
+
+两个流程都可以去 Actions 页面手动触发。
 
 ## 授权
 

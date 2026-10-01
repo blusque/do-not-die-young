@@ -1,0 +1,3 @@
+# 本地生成的 PDF 产物不进仓库：PDF 由 .github/workflows/pdf.yml 每天自动发布到 Release
+dist/
+*.pdf

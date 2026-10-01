@@ -1,0 +1,77 @@
+name: pdf
+
+# 每天北京时间 07:00 从上游拉最新书稿，生成 simple / full 两个 PDF，
+# 发布到滚动 Release（固定 tag：pdf-latest），下载链接长期不变。
+on:
+  schedule:
+    # UTC 23:00 = 北京时间次日 07:00
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pdf
+  cancel-in-progress: false
+
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: pdf-latest
+      RELEASE_TITLE: 高性价比人生指南 · PDF（每日更新）
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装中文字体
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
+      - name: 从源头拉取最新书稿
+        run: git clone --depth 1 https://github.com/eternity4719/HowToLiveBetter.git "$RUNNER_TEMP/upstream"
+
+      - name: 生成 index.html
+        run: python build.py all -o index.html --repo "$RUNNER_TEMP/upstream"
+
+      - name: 转成 PDF（simple / full）
+        run: python make_pdf.py index.html -o dist --paper A4
+
+      - name: 发布到 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REV="$(git -C "$RUNNER_TEMP/upstream" rev-parse --short HEAD)"
+          DATE="$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+          NOTES="$RUNNER_TEMP/notes.md"
+          cat > "$NOTES" <<EOF
+          上游版本：eternity4719/HowToLiveBetter@${REV}
+          构建时间：${DATE}（北京时间）
+
+          包含两个版本：
+          - \`how-to-live-better-full.pdf\`：展开每条的「来源」文献
+          - \`how-to-live-better-simple.pdf\`：来源只保留「来源（N 条文献）」一行
+
+          由 .github/workflows/pdf.yml 自动生成。
+          EOF
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --title "$RELEASE_TITLE" --notes-file "$NOTES"
+          else
+            gh release create "$RELEASE_TAG" --title "$RELEASE_TITLE" --notes-file "$NOTES"
+          fi
+          gh release upload "$RELEASE_TAG" dist/*.pdf --clobber
+
+      - name: 保留产物（方便排查）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-${{ github.run_id }}
+          path: dist/*.pdf
+          retention-days: 7
+          if-no-files-found: ignore
