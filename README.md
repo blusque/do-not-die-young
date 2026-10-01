@@ -67,7 +67,7 @@ python make_pdf.py index.html -o dist
 - `.github/workflows/pdf.yml` 每天 07:00（北京时间）从上游拉最新书稿，生成
   simple / full 两个 PDF，发布到滚动 Release：
 
-  **下载：** https://github.com/cdyforever/how-to-live-better/releases/tag/pdf-latest
+  **下载：** https://github.com/blusque/do-not-die-young/releases/tag/pdf-latest
 
   该 Release 的 tag 固定为 `pdf-latest`，每天覆盖更新，链接长期不变。
 
